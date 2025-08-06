@@ -91,10 +91,10 @@ docker exec -it vault_server sh
 ## Project Folder Structure:
 ```text
 .
-├── vault/         # Vault container & configuration files
-├── postgres/      # SQL init script and configuration
-├── pgadmin/       # pgAdmin Docker setup
-├── Scripts/       # Automation scripts (initialization, cleanup, etc.)
+├── vault/            # Vault container & configuration files
+├── postgres/         # SQL init script and configuration
+├── pgadmin/          # pgAdmin Docker setup
+├── Scripts/          # Automation scripts (initialization, cleanup, etc.)
 ├── docker-compose.yml
 ├── README.md
 └── requirements.txt  # Python dependencies
