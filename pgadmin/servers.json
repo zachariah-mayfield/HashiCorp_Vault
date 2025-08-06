@@ -1,0 +1,14 @@
+{
+  "Servers": {
+    "1": {
+      "Name": "VaultDB",
+      "Group": "Vault",
+      "Host": "postgres",
+      "Port": 5432,
+      "MaintenanceDB": "vault",
+      "Username": "vaultuser",
+      "SSLMode": "prefer",
+      "PassFile": "/pgpass"
+    }
+  }
+}

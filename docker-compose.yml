@@ -1,0 +1,80 @@
+# ~/GitHub/Main/HashiCorp_Vault/docker-compose.yml
+# Documentation in ~/GitHub/Main/HashiCorp_Vault/Documentation/documentation-docker-c0mpose.yml
+services:
+# -----------------------   Service: postgres — the PostgreSQL database   -----------------------
+  postgres:
+    build:  # NEW — build a custom image from ./postgres
+      context: .
+      dockerfile: ./postgres/Docker/Dockerfile
+    container_name: vault_postgres
+    restart: unless-stopped
+    env_file:
+      - .env
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5 
+    volumes:
+      - pgdata:/var/lib/postgresql/data # Persistent database data only
+      - ./postgres/Config:/Config  # <-- mount Config folder here - this will hold the rendered init.sql file
+    ports:
+      - "5432:5432"
+
+# -----------------------   Service: vault — the HashiCorp Vault server   -----------------------
+  vault:
+    build:
+      context: ./vault
+      dockerfile: Docker/Dockerfile
+    image: vault:custom
+    container_name: vault_server       
+    restart: unless-stopped
+    env_file:
+      - .env   
+    ports:
+      - "8200:8200" # Vault UI: http://localhost:8200/ui/
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGPASSWORD: ${POSTGRES_PASSWORD}  # used by Vault's PostgreSQL storage backend
+    #command: ["/bin/sh", "/vault/Scripts/start_hashicorp_vault.sh"]
+    volumes:
+      - ./vault/config:/vault/config
+      - ./vault/Scripts/:/vault/Scripts/:ro
+      - ./vault/data:/vault/file
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+# -----------------------   Service: pgadmin — GUI for PostgreSQL   -----------------------
+  pgadmin: 
+    image: dpage/pgadmin4 
+    container_name: vault_pgadmin
+    restart: unless-stopped
+    env_file:
+      - .env 
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "False"     
+    ports:
+      - "8080:80" # http://localhost:8080/browser/
+    depends_on:
+      postgres:
+        condition: service_healthy     
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+      - ./pgadmin/servers.json:/pgadmin4/servers.json
+
+volumes:
+  pgdata:
+  vault_data:
+  pgadmin_data:

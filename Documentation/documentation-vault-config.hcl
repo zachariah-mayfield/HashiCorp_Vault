@@ -1,0 +1,35 @@
+# ~/GitHub/Main/HashiCorp_Vault/vault-config.hcl
+# vault-config.hcl — Vault Configuration File
+# This config:
+# Tells Vault how to start and where to store data
+# Use PostgreSQL for storage - Provides persistent storage (not memory-only)
+# Listen on port 8200 (insecure for now)
+# Enable the Vault UI
+# disable_mlock = true is needed for Docker.
+# tls_disable = true is for learning — I will secure it later.
+# postgres://user:pass@host:port/db is standard PostgreSQL format.
+# # connection_url = "postgres://user:pass@localhost:5432/database?sslmode=disable"
+
+ui = true
+
+disable_mlock = true
+
+storage "postgresql" {
+  connection_url = "postgresql://${POSTGRES_USER}:${POSTGRES_PASSWORD}@vault_postgres:5432/${POSTGRES_DB}?sslmode=disable"
+}
+
+listener "tcp" {
+  address     = "0.0.0.0:8200"
+  tls_disable = true
+}
+
+# # This block sets Vault’s configuration via an inline JSON config passed through the VAULT_LOCAL_CONFIG env variable.
+# "ui": true: Enables the Vault web UI.
+# "listener": Defines how Vault listens for incoming connections.
+# "address": "0.0.0.0:8200": Listen on all network interfaces. Bind to all network interfaces on port 8200. &
+# “Vault will accept connections from any source interface (loopback, container network, LAN) on port 8200.”
+# Inside a Docker container, Vault listens on 0.0.0.0:8200 this makes it reachable from your host machine
+# "tls_disable": true: Disables TLS (only for development/testing).
+# "storage": Tells Vault to use PostgreSQL as its backend.
+# "connection_url": Connects to the postgres service using provided user/pass.
+# "disable_mlock": true: Required inside Docker — skips memory locking (not secure but necessary in containers).  

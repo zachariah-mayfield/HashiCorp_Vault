@@ -1,0 +1,140 @@
+# ~/GitHub/Main/HashiCorp_Vault/docker-compose.yml
+# Docker Compose Spins up Vault + PostgreSQL in one command
+# This sets up Vault and PostgreSQL as services.
+
+# This is the parent block defining all containers you want Docker Compose to create and run. Each service runs as a separate container.
+services:
+# -----------------------   Service: postgres — the PostgreSQL database   -----------------------
+# postgres: The service name (used by other containers like Vault and pgAdmin to refer to it).
+# image: postgres:15: Pulls the official PostgreSQL v15 image from Docker Hub.
+  postgres:
+    build:  # NEW — build a custom image from ./postgres
+      context: .
+      dockerfile: ./postgres/Docker/Dockerfile
+#    image: postgres:15 # :latest - to use the latest version — now it will build a custom image from ./postgres
+# Overrides the auto-generated container name with vault_postgres.    
+    container_name: vault_postgres
+# Ensures the container automatically restarts if it crashes or reboots — unless you explicitly stop it.    
+    restart: unless-stopped
+    env_file:
+      - .env
+# Sets up environment variables inside the container:
+# POSTGRES_USER: The DB username Vault will use.
+# POSTGRES_PASSWORD: The password for that user.
+# POSTGRES_DB: Creates a database called vaultdb.
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+# Health check to make sure that postgres is ready before vault starts.
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+# Mounts a named volume (pgdata) to store PostgreSQL data persistently under /var/lib/postgresql/data.
+# Without this, your DB would be lost on container restart.    
+    volumes:
+      # This is a named Docker volume that persists the actual PostgreSQL data (tables, schemas, etc.)
+      # It survives container rebuilds and is stored on the host system in Docker's volume storage.
+      - pgdata:/var/lib/postgresql/data # Persistent database data only
+      - ./postgres/Config:/Config  # <-- mount Config folder here - this will hold the rendered init.sql file
+      # This is a bind mount from your local project directory.
+      # It copies the `init.sql` file into the container’s special init directory.
+      # If the database does not yet exist, this file will be executed automatically on first boot.
+      # Useful for preloading tables, users, or custom SQL setup.
+#      - ./postgres/init.sql:/docker-entrypoint-initdb.d/init.sql # OLD - Remove this when enabling the Dockerfile for the custom image.
+    ports:
+      - "5432:5432"
+
+# -----------------------   Service: vault — the HashiCorp Vault server   -----------------------
+  vault:
+#    image: vault:1.13.3 # - replaced, using a Dockerfile now for a custom container image. 
+# this service uses a Dockerfile with a custom image of hashicopr vault
+    build:
+      context: .
+      dockerfile: ./vault/Docker/Dockerfile   
+# Custom name for the Vault container.    
+    container_name: vault_server
+# Ensures the container automatically restarts if it crashes or reboots — unless you explicitly stop it.        
+    restart: unless-stopped
+    env_file:
+      - .env
+# Exposes Vault’s port 8200 to your local system.
+# Format: "hostPort:containerPort"    
+    ports:
+      - "8200:8200"  # http://localhost:8200/ui/vault/init
+# Adds the IPC_LOCK Linux capability so Vault can lock memory and avoid swapping secrets to disk.
+# Needed for secure Vault operation (though disable_mlock disables it in config below).      
+    cap_add:
+      - IPC_LOCK
+    environment:
+      VAULT_ADDR: "http://0.0.0.0:8200"
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+      POSTGRES_DB: ${POSTGRES_DB}
+      PGPASSWORD: ${POSTGRES_PASSWORD}  # used by Vault's PostgreSQL storage backend
+    command: ["/bin/sh", "/vault/Scripts/start_hashicorp_vault.sh"]
+    volumes:
+      # Mount the entire `vault/config` folder from your host machine into the container.
+      # This includes the main Vault config file (vault-config.hcl).
+      # `:ro` means "read-only" — Vault can read the config, but not write to it (good for security).
+      - ./vault/config:/vault/config:ro
+      # Mount your local `Scripts/` directory containing your helper scripts
+      # like `start_hashicorp_vault.sh` and `initialization_and_auto-unseal.sh`.
+      # Also marked read-only since Vault only needs to run them.
+      - ./vault/Scripts/:/vault/Scripts/:ro
+      # This is a bind mount where Vault can write dynamic runtime data,
+      # including the `vault-init.json` file (used to persist unseal keys & root token).
+      # It is crucial for persistent state across container restarts or rebuilds.
+      - ./vault/data:/vault/file
+# Ensures PostgreSQL starts before Vault.
+# Does not wait until PostgreSQL is ready, just that the container is started.        
+    depends_on:
+      postgres:
+        condition: service_healthy
+
+# -----------------------   Service: pgadmin — GUI for PostgreSQL   -----------------------
+  pgadmin:
+# Uses the official pgAdmin 4 image (a web UI for PostgreSQL).  
+    image: dpage/pgadmin4 # dpage/pgadmin4:latest - to use the latest version
+# Custom container name.    
+    container_name: vault_pgadmin
+# Ensures the container automatically restarts if it crashes or reboots — unless you explicitly stop it.
+    restart: unless-stopped
+# Sets up pgAdmin's internal user and disables "server mode" to enable custom preloaded server configurations:
+# PGADMIN_DEFAULT_EMAIL: login username for the web UI.
+# PGADMIN_DEFAULT_PASSWORD: login password.
+# PGADMIN_CONFIG_SERVER_MODE: False allows loading a custom servers.json.    
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_PASSWORD}
+      PGADMIN_CONFIG_SERVER_MODE: "False" # set this to false to load the predefine saved servers using a file (pgadmin/servers.json) 
+# Maps host port 8080 to container port 80, so you access pgAdmin at http://localhost:8080.      
+    ports:
+      - "8080:80"  # http://localhost:8080/browser/
+# Ensures pgAdmin starts after PostgreSQL.
+    depends_on:
+      postgres:
+        condition: service_healthy
+# Mounts:
+# A named volume (pgadmin_data) to store pgAdmin's internal config and user data.
+# A bind mount (./pgadmin/servers.json) so you can preload server connections into pgAdmin.      
+    volumes:
+      # This is a named volume that stores pgAdmin settings, session state, and connection configs.
+      # It ensures user preferences and server setups persist across container restarts.
+      - pgadmin_data:/var/lib/pgadmin # local persistent storage
+      # This bind mount copies in a custom `servers.json` file from your local project.
+      # It preconfigures pgAdmin with saved database connections on first startup.
+      # Very useful for auto-adding your Vault PostgreSQL database so you don’t have to set it up manually.
+      - ./pgadmin/servers.json:/pgadmin4/servers.json # to load the predefine saved servers use this file. (pgadmin/servers.json) 
+
+# Defines named volumes used above:
+# pgdata --> persistent data for PostgreSQL
+# vault_data --> persistent data for hashicorp vault
+# pgadmin_data --> persistent settings for pgAdmin
+# These are managed by Docker and can be listed with docker volume ls.
+volumes:
+  pgdata:
+  vault_data:
+  pgadmin_data:
