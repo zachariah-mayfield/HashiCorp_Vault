@@ -93,3 +93,4 @@ docker exec -it vault_server sh
         - ~/GitHub/Main/HashiCorp_Vault/postgres/Config/init.sql -->DONE
 - Create a Dockerfile for pgadmin and fix its folder structure.
 - Finish updating and creating documentation.
+- Incorporate adding an access policy to enable secrets engine, and finish configuring Vault.
