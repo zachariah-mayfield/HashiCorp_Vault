@@ -130,7 +130,9 @@ docker exec -it vault_server sh
     - Confirm Docker Compose version compatibility.
     - Remove stale volumes/networks using prune commands above.
 
-## Additional References: 
+## Additional References:
+- Additional Documentation in:
+    - ~/GitHub/Main/HashiCorp_Vault/Documentation
 - Will add more here later ...............
 
 ## Key Capabilities This Project Implements:
@@ -145,7 +147,7 @@ docker exec -it vault_server sh
 - Allows full container rebuilds while maintaining state via Docker volumes
 - Organizes scripts, configuration, and Dockerfiles into a clear and reusable structure
 
-# Why PostgreSQL:
+## Why PostgreSQL:
 - PostgreSQL provides a production-ready, scalable, and industry-standard RDBMS as a backend that integrates well with Vault’s storage engine.
 
 ---
