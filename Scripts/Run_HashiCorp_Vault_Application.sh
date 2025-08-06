@@ -1,6 +1,7 @@
 #!/bin/bash
 # ~/GitHub/Main/HashiCorp_Vault/Scripts/Run_HashiCorp_Vault_Application.sh
 
+# Check if the VIRTUAL_ENV environment variable is not empty.
 if [[ -n "$VIRTUAL_ENV" ]]; then
   echo "You are in a Python virtual environment: $VIRTUAL_ENV"
 else

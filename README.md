@@ -77,19 +77,19 @@ docker exec -it vault_server sh
 # Things to do:
 - make pgadmin optional 
 - remove any hard coding
-- remove sensitive data 
-- make sure it stops the container and restarts it without loosing its data
-- make sure its able to be blow away and recreated without issue
+- remove sensitive data -->DONE
+- make sure it stops the container and restarts it without loosing its data -->DONE
+- make sure its able to be blow away and recreated without issue -->DONE
 - make pgadmin use a Dockerfile as well
 - clean up folder structure
-- create a Docker-Down script to:
-    - bring the docker container down to be able to restart later when needed and persist data.
-- create a Nuke-Everything script to:
-    - docker-compose down --volumes --remove-orphans
-    - (Start from Scratch)
-    - remove:  
-        - ~/GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json
-        - ~/GitHub/Main/HashiCorp_Vault/postgres/init.sql
-        - ~/GitHub/Main/HashiCorp_Vault/postgres/Config/init.sql
-
-~/GitHub/Main/HashiCorp_Vault/
+- create a Docker-Down script to:  -->DONE
+    - bring the docker container down to be able to restart later when needed and persist data.  -->DONE
+- create a Nuke-Everything script to:  -->DONE
+    - docker-compose down --volumes --remove-orphans  -->DONE
+    - (Start from Scratch)  -->DONE
+    - remove: -->DONE
+        - ~/GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json -->DONE
+        - ~/GitHub/Main/HashiCorp_Vault/vault/config/vault-config.hcl -->DONE
+        - ~/GitHub/Main/HashiCorp_Vault/postgres/Config/init.sql -->DONE
+- Create a Dockerfile for pgadmin and fix its folder structure.
+- Finish updating and creating documentation.
