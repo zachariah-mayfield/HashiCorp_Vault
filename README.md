@@ -1,3 +1,6 @@
+# 
+- I have containerized Hashicorp Vault. I have created 3 Docker Containers. vault_server, vault_postgres, and vault_pgadmin. I created a docker-compose.yml and 3 Dockerfile files to run all of this. I created many shell scripts to do everything including preforming  the initialization and unseal of the vault server. I created sql and hcl templates to incorporate a ,env file for var secrets. I have also wrote a ReadMe file and more documentation in the documentation folder. and all of this run from a python virtual environmment. This app is portable and persistent once setup. This is the first commit after getting everything set up and running correctly. I will add more later.
+
 # HashiCorp_Vault
 HashiCorp Vault Community Edition Server Mode - 
 
