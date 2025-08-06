@@ -52,8 +52,9 @@ services:
 #    image: vault:1.13.3 # - replaced, using a Dockerfile now for a custom container image. 
 # this service uses a Dockerfile with a custom image of hashicopr vault
     build:
-      context: .
-      dockerfile: ./vault/Docker/Dockerfile   
+      context: ./vault
+      dockerfile: Docker/Dockerfile
+    image: vault:custom  
 # Custom name for the Vault container.    
     container_name: vault_server
 # Ensures the container automatically restarts if it crashes or reboots — unless you explicitly stop it.        
@@ -79,7 +80,7 @@ services:
       # Mount the entire `vault/config` folder from your host machine into the container.
       # This includes the main Vault config file (vault-config.hcl).
       # `:ro` means "read-only" — Vault can read the config, but not write to it (good for security).
-      - ./vault/config:/vault/config:ro
+      - ./vault/config:/vault/config
       # Mount your local `Scripts/` directory containing your helper scripts
       # like `start_hashicorp_vault.sh` and `initialization_and_auto-unseal.sh`.
       # Also marked read-only since Vault only needs to run them.

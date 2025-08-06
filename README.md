@@ -55,10 +55,10 @@ docker exec -it vault_server sh
 
 
 
-# Wait ~5 seconds, then:
+# 
 ```bash
 # bash
-./init-unseal.sh
+
 ```
 
 # Visit Vault UI:
