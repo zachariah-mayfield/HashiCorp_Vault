@@ -11,7 +11,7 @@
     - Automated initialization and unseal
     - PGadmin for learning
 
-- ChatGPT's Answer: This project provides a fully containerized deployment of HashiCorp Vault (Community Edition) in server mode, using PostgreSQL as a durable storage backend, and built for automation-first workflows using Docker Compose and shell scripts.
+- This project provides a fully containerized deployment of HashiCorp Vault (Community Edition) in server mode, using PostgreSQL as a durable storage backend, and built for automation-first workflows using Docker Compose and shell scripts.
 - It is designed for:
     - Learning and experimentation with HashiCorp Vault in a persistent, multi-container setup.
     - Infrastructure engineers or platform teams looking to integrate Vault into real-world container environments with PostgreSQL instead of file-based or in-memory storage.
