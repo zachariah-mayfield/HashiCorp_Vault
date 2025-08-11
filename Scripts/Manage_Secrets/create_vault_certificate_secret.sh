@@ -1,5 +1,5 @@
 #!/bin/bash
-# ~/GitHub/Main/HashiCorp_Vault/Scripts/create_vault_certificate_secret.sh
+# ~/GitHub/Main/HashiCorp_Vault/Scripts/Manage_Secrets/create_vault_certificate_secret.sh
 
 export VAULT_TOKEN=$(jq -r .root_token vault/data/vault-init.json)
 

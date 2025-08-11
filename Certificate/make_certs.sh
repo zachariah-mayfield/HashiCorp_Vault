@@ -57,9 +57,9 @@ subjectAltName = @alt_names
 
 [alt_names]
 IP.1 = 127.0.0.1
-IP.2 = 172.18.0.4
 DNS.1 = localhost
 DNS.2 = vault_server
+DNS.3 = vault-server
 EOF
 
 # Root CA key (keep safe)

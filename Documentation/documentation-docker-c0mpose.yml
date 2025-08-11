@@ -70,7 +70,6 @@ services:
     cap_add:
       - IPC_LOCK
     environment:
-      VAULT_ADDR: "http://0.0.0.0:8200"
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
@@ -89,6 +88,14 @@ services:
       # including the `vault-init.json` file (used to persist unseal keys & root token).
       # It is crucial for persistent state across container restarts or rebuilds.
       - ./vault/data:/vault/file
+      # Mount the policies directory
+      - ./vault/policies:/vault/policies
+      # Mount the templates directory
+      - ./vault/Templates:/vault/Templates
+      # Mount the certificates directory
+      - ./vault/Certs:/vault/certs:ro
+      # Mount the local time zone so that the container uses the host's time zone and will not cause TLS issues.
+      - /etc/localtime:/etc/localtime:ro  # Make sure your container’s time zone matches your host or use UTC consistently.
 # Ensures PostgreSQL starts before Vault.
 # Does not wait until PostgreSQL is ready, just that the container is started.        
     depends_on:

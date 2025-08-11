@@ -1,7 +1,8 @@
+#!/bin/bash
+# ~/GitHub/Main/HashiCorp_Vault/Scripts/Manage_Secrets/create_secret.sh
+
 # Extract the Vault root token from the initialization file.
 export ROOT_TOKEN=$(jq -r '.root_token' "$INIT_FILE")
-# Login with root token
-# VAULT_TOKEN="$ROOT_TOKEN" vault login "$ROOT_TOKEN" > /dev/null
 
 echo "Check ~/GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json for the root token."
 # export VAULT_TOKEN=$(jq -r .root_token vault/data/vault-init.json)

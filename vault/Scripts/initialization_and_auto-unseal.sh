@@ -74,5 +74,11 @@ if ! vault policy list | grep -q "secrets-engine-policy"; then
   vault policy write secrets-engine-policy /vault/policies/secrets_engine_policy.hcl
 fi
 
-# Enable the secrets engine
-vault secrets enable -path=secret -version=2 kv
+# Enable the KV secrets engine at 'secret/' if not already enabled
+if vault secrets list -format=json | jq -e '."secret/"' > /dev/null; then
+    echo "Secrets engine already enabled at 'secret/'. Skipping..."
+else
+    echo "Enabling KV secrets engine at 'secret/'..."
+    # Enable the secrets engine
+    vault secrets enable -path=secret -version=2 kv
+fi

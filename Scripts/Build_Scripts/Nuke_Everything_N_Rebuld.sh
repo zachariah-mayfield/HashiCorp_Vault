@@ -1,5 +1,5 @@
 #!/bin/bash
-# ~/GitHub/Main/HashiCorp_Vault/Scripts/Nuke_Everything_N_Rebuld.sh
+# ~/GitHub/Main/HashiCorp_Vault/Scripts/Build_Scripts/Nuke_Everything_N_Rebuld.sh
 
 INIT_FILE=~/"GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json"
 
@@ -13,17 +13,21 @@ else
   exit 1
 fi
 
-# Remove Vault file that holds Keys and Token
-echo "removing vault-init.json"
-rm -f ~/"GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json"
 # Remove PostgreSQL config 
 echo "removing init.sql"
 rm -f ~/"GitHub/Main/HashiCorp_Vault/postgres/Config/init.sql"
+
+# Remove Certificates
+echo "removing Certificates"
+rm -rf ~/"GitHub/Main/HashiCorp_Vault/vault/Certs"
+
 # Remove vault config 
 echo "removing vault-config.hcl"
 rm -f ~/"GitHub/Main/HashiCorp_Vault/vault/config/vault-config.hcl"
 
-# ~/"GitHub/Main/HashiCorp_Vault/vault/policies/secrets_engine_policy.hcl"
+# Remove Vault file that holds Keys and Token
+echo "removing vault-init.json"
+rm -f ~/"GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json"
 
 # This is the core command that stops and removes the containers and networks defined in your container and remove any named volumes and clean up "orphan" containers.
 docker-compose down --volumes --remove-orphans
