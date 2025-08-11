@@ -1,0 +1,5 @@
+vault_addr: "http://127.0.0.1:8200"
+vault_token: "{{ (lookup('file', '~/GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json') | from_json).root_token }}"
+vault_path: "secret/certificates/Lenovo-T480/SSH_user_login"
+cert_file: "~/GitHub/Main/HashiCorp_Vault/Ansible/roles/pull_cert_n_key_from_vault/files/certificate.pem"
+key_file: "~/GitHub/Main/HashiCorp_Vault/Ansible/roles/pull_cert_n_key_from_vault/files/server.key"

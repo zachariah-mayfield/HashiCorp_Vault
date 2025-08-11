@@ -1,0 +1,40 @@
+- name: Get Certificate and Key from Vault
+  # vars: - Look in ~/GitHub/Main/HashiCorp_Vault/Ansible/roles/pull_cert_n_key_from_vault/defaults/main.yml for these variables
+  block:
+    - name: Read vault-init.json file from ~/GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json
+      slurp:
+        src: "{{ lookup('env', 'HOME') }}/GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json"
+      register: vault_init_raw
+
+    - name: Set vault_token fact
+      ansible.builtin.set_fact:
+        vault_token: "{{ (vault_init_raw.content | b64decode | from_json).root_token }}"
+
+    - name: Show the Vault token (for verification)
+      debug:
+        msg: "Vault token is: {{ vault_token }}"
+
+    - name: Fetch cert and key data from Vault (single call)
+      ansible.builtin.set_fact:
+        cert_key_data: "{{ lookup('community.hashi_vault.hashi_vault', vault_cert_path,
+                                  token=vault_token,
+                                  url=vault_addr,
+                                  engine_mount='secret',
+                                  version=2) }}"
+
+    - name: Convert escaped newlines in cert and key to real newlines
+      ansible.builtin.set_fact:
+        cert: "{{ cert_key_data.cert | regex_replace('\\\\n', '\n') }}"
+        key: "{{ cert_key_data.key | regex_replace('\\\\n', '\n') }}"                      
+
+    - name: Write certificate to file
+      copy:
+        content: "{{ cert }}"
+        dest: "{{ lookup('env', 'HOME') }}/GitHub/Main/HashiCorp_Vault/Ansible/roles/pull_cert_n_key_from_vault/files/certificate.pem"
+        mode: '0644'
+
+    - name: Write private key to file
+      copy:
+        content: "{{ key }}"
+        dest: "{{ lookup('env', 'HOME') }}/GitHub/Main/HashiCorp_Vault/Ansible/roles/pull_cert_n_key_from_vault/files/server.key"
+        mode: '0600'

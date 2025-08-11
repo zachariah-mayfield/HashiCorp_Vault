@@ -1,0 +1,78 @@
+- name: Install HashiCorp Vault CLI
+  block:
+    - name: Set OS-specific facts
+      set_fact:
+        is_macos: "{{ ansible_facts['os_family'] == 'Darwin' }}"
+        is_linux: "{{ ansible_facts['os_family'] == 'Debian' or ansible_facts['os_family'] == 'RedHat' }}"
+        is_windows: "{{ ansible_facts['os_family'] == 'Windows' }}"
+
+    - name: Determine Vault download URL and archive path
+      set_fact:
+        vault_os: >-
+          {{ 'darwin' if is_macos else
+             'linux' if is_linux else
+             'windows' if is_windows else 'unsupported' }}
+        vault_arch: "{{ 'amd64' if ansible_architecture == 'x86_64' else 'arm64' }}"
+        vault_zip: "vault_{{ vault_version }}_{{ vault_os }}_{{ vault_arch }}.zip"
+        vault_url: "{{ vault_cli_url_base }}/{{ vault_version }}/{{ vault_zip }}"
+
+    - name: Create installation directory (Unix)
+      file:
+        path: "{{ vault_install_dir_unix }}"
+        state: directory
+        mode: '0755'
+      when: not is_windows
+
+    - name: Create installation directory (Windows)
+      win_file:
+        path: "{{ vault_install_dir_windows }}"
+        state: directory
+      when: is_windows
+
+    - name: Download Vault zip (Unix)
+      get_url:
+        url: "{{ vault_url }}"
+        dest: "/tmp/{{ vault_zip }}"
+        mode: '0644'
+      when: not is_windows
+
+    - name: Unzip Vault (Unix)
+      unarchive:
+        src: "/tmp/{{ vault_zip }}"
+        dest: "{{ vault_install_dir_unix }}"
+        remote_src: yes
+      when: not is_windows
+
+    - name: Ensure Vault is executable (Unix)
+      file:
+        path: "{{ vault_install_dir_unix }}/vault"
+        mode: '0755'
+      when: not is_windows
+
+    - name: Download Vault zip (Windows)
+      win_get_url:
+        url: "{{ vault_url }}"
+        dest: "C:\\Windows\\Temp\\{{ vault_zip }}"
+      when: is_windows
+
+    - name: Unzip Vault (Windows)
+      win_unzip:
+        src: "C:\\Windows\\Temp\\{{ vault_zip }}"
+        dest: "{{ vault_install_dir_windows }}"
+        creates: "{{ vault_install_dir_windows }}\\vault.exe"
+      when: is_windows
+
+    - name: Add Vault to Windows user PATH
+      win_path:
+        elements: "{{ vault_install_dir_windows }}"
+        state: present
+      when: is_windows
+
+    - name: Verify Vault installation
+      command: "{{ 'vault version' if not is_windows else 'vault.exe version' }}"
+      register: vault_version_output
+      changed_when: false
+
+    - name: Show Vault CLI version
+      debug:
+        msg: "{{ vault_version_output.stdout }}"

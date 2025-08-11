@@ -11,5 +11,11 @@ storage "postgresql" {
 }
 listener "tcp" {
   address     = "0.0.0.0:8200"
-  tls_disable = 1
+  tls_cert_file      = "/vault/certs/vault-server.crt"
+  tls_key_file       = "/vault/certs/vault-server.key"
+  tls_client_ca_file = "/vault/certs/rootCA.crt"
+  tls_require_and_verify_client_cert = false
+  tls_min_version      = "tls12"   # Force minimum TLS 1.2
+  tls_max_version      = "tls13"   # Optional, allows TLS 1.3 only
 }
+api_addr = "https://127.0.0.1:8200"

@@ -190,6 +190,14 @@ docker logs vault_server
 # Place holder
 ```
 
+```bash
+# bash
+# Install Ansible Collection Plugin: community.hashi_vault
+ansible-galaxy collection install community.hashi_vault
+# Run the Ansible PlayBook to pull the Certificate and Key from HashiCorp Vault and store them in files.
+ansible-playbook Ansible/playbook_pull_cert_n_key_from_vault.yml -v
+```
+
 ### Visit Vault UI:
 - http://localhost:8200
 - use your token from: ~/GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json --> "root_token": ""
@@ -217,3 +225,22 @@ docker logs vault_server
 - Create a Dockerfile for pgadmin and fix its folder structure.
 - Finish updating and creating documentation.
 - Incorporate adding an access policy to enable secrets engine, and finish configuring Vault.
+
+
+
+
+
+
+
+
+
+openssl x509 -noout -text -in vault/Certs/HashiCorp_Vault.crt
+  826  openssl rsa -check -in vault/Certs/HashiCorp_Vault.key
+  827  openssl x509 -noout -modulus -in vault/Certs/HashiCorp_Vault.crt | openssl md5
+  828  openssl rsa -noout -modulus -in vault/Certs/HashiCorp_Vault.key | openssl md5
+  829  openssl verify -CAfile vault/Certs/Zachariah_MacBook_CA.crt vault/Certs/HashiCorp_Vault.crt
+  830  export VAULT_ADDR=https://127.0.0.1:8200
+  831  export VAULT_CACERT=~/GitHub/Main/HashiCorp_Vault/vault/Certs/Zachariah_MacBook_CA.crt
+  832  export VAULT_CLIENT_CERT=~/GitHub/Main/HashiCorp_Vault/vault/Certs/HashiCorp_Vault.crt
+  833  export VAULT_CLIENT_KEY=~/GitHub/Main/HashiCorp_Vault/vault/Certs/HashiCorp_Vault.key
+  834  openssl s_client -connect 127.0.0.1:8200 -cert ~/GitHub/Main/HashiCorp_Vault/vault/Certs/HashiCorp_Vault.crt -key ~/GitHub/Main/HashiCorp_Vault/vault/Certs/HashiCorp_Vault.key -CAfile ~/GitHub/Main/HashiCorp_Vault/vault/Certs/Zachariah_MacBook_CA.crt

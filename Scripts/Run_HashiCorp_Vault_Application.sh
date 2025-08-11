@@ -7,7 +7,7 @@ if [[ -n "$VIRTUAL_ENV" ]]; then
 else
   echo "You are NOT in a Python virtual environment."
   echo "Please activate your Python virtual environment before running this script."
-  echo "Run the following to activate your Python Virtual Environment: source ~/GitHub/Main/HashiCorp_Vault/venv/bin/activate"
+  echo "Run the following to activate your Python Virtual Environment: source ~/GitHub/Main/HashiCorp_Vault/.venv/bin/activate"
   exit 1
 fi
 

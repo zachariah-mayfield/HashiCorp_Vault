@@ -3,6 +3,10 @@
 # SSH File - Sensitive Data
 */id_rsa_pem
 
+# Certificates - Sensitive Data
+Certificate/Certificates/*
+vault/Certs/*
+
 # Azure DevOps - Sensitive Data
 */PAT.txt
 
@@ -32,6 +36,10 @@ postgres/Config/*
 # Ignore Ansible Sensitive files:
 Ansible/roles/*/vars/main.yml
 Ansible/inventory*
+/Ansible/roles/pull_cert_n_key_from_vault/files/*
+
+# Ignore all files in the Ansible role 'pull_cert_n_key_from_vault' 'files' directory
+/Ansible/roles/pull_cert_n_key_from_vault/files/*
 
 # Ignore Terraform Sensitive files:
 Terraform/*/terraform.tfvars

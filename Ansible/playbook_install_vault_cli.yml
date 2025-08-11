@@ -1,0 +1,8 @@
+---
+- name: PlayBook - Install Vault CLI
+  hosts: localhost
+  become: false
+  #become_method: sudo
+  gather_facts: true
+  roles:
+    - install_vault_cli

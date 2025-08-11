@@ -1,0 +1,8 @@
+---
+- name: PlayBook - Push certificate and key to Vault using CLI
+  hosts: localhost
+  become: false
+  #become_method: sudo
+  gather_facts: true
+  roles:
+    - push_cert_n_key_to_vault_cli

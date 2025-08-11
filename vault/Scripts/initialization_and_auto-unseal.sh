@@ -9,11 +9,24 @@
 
 set -euo pipefail
 
-export VAULT_ADDR="http://127.0.0.1:8200"
+export VAULT_ADDR='https://127.0.0.1:8200'
+export VAULT_CACERT='/vault/certs/rootCA.crt'
+export VAULT_CLIENT_CERT='/vault/certs/vault-client.crt'
+export VAULT_CLIENT_KEY='/vault/certs/vault-client.key'
 
 INIT_FILE="/vault/file/vault-init.json"
 
-echo "Checking Vault status..."
+# Wait for Vault to become responsive
+echo "Waiting for Vault to become responsive..."
+until curl --cert $VAULT_CLIENT_CERT \
+  --key $VAULT_CLIENT_KEY \
+  --cacert $VAULT_CACERT \
+  "$VAULT_ADDR/v1/sys/health" | \
+  jq -e '.initialized != null' > /dev/null 2>&1; do
+  echo "Vault not ready — retrying in 2s..."
+  sleep 2
+done
+echo "Vault is up!"
 
 # Vault must be reachable for this to work
 VAULT_STATUS=$(vault status 2>/dev/null || true)
@@ -51,3 +64,15 @@ fi
 # Login with root token
 VAULT_TOKEN="$ROOT_TOKEN" vault login "$ROOT_TOKEN" > /dev/null
 echo "Vault is unsealed and logged in."
+
+# Ensure the correct root token from the init file is used
+export VAULT_TOKEN="$(jq -r .root_token /vault/file/vault-init.json)"
+
+# Write the generated policy
+if ! vault policy list | grep -q "secrets-engine-policy"; then
+  echo "Writing 'secrets-engine-policy'..."
+  vault policy write secrets-engine-policy /vault/policies/secrets_engine_policy.hcl
+fi
+
+# Enable the secrets engine
+vault secrets enable -path=secret -version=2 kv

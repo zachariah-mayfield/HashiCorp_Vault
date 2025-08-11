@@ -40,7 +40,7 @@ services:
     cap_add:
       - IPC_LOCK
     environment:
-      VAULT_ADDR: "http://0.0.0.0:8200"
+      #VAULT_ADDR: "https://0.0.0.0:8200"
       POSTGRES_USER: ${POSTGRES_USER}
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
       POSTGRES_DB: ${POSTGRES_DB}
@@ -50,6 +50,10 @@ services:
       - ./vault/config:/vault/config
       - ./vault/Scripts/:/vault/Scripts/:ro
       - ./vault/data:/vault/file
+      - ./vault/policies:/vault/policies
+      - ./vault/Templates:/vault/Templates
+      - ./vault/Certs:/vault/certs:ro
+      - /etc/localtime:/etc/localtime:ro  # Make sure your container’s time zone matches your host or use UTC consistently.
     depends_on:
       postgres:
         condition: service_healthy

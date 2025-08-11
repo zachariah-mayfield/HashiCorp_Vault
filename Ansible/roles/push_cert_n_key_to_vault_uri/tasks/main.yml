@@ -1,0 +1,41 @@
+---
+- name: Read vault-init.json to get Vault token
+  slurp:
+    src: "{{ lookup('env', 'HOME') }}/GitHub/Main/HashiCorp_Vault/vault/data/vault-init.json"
+  register: vault_init_raw
+
+- name: Set vault_token fact
+  set_fact:
+    vault_token: "{{ (vault_init_raw.content | b64decode | from_json).root_token }}"
+
+- name: Read local certificate file
+  slurp:
+    src: "{{ cert_file }}"
+  register: cert_file_content
+
+- name: Read local private key file
+  slurp:
+    src: "{{ key_file }}"
+  register: key_file_content
+
+- name: Prepare certificate and key strings with escaped newlines
+  set_fact:
+    cert_escaped: "{{ cert_file_content.content | b64decode }}"
+    key_escaped:  "{{ key_file_content.content  | b64decode }}"
+
+- name: Upload cert and key to Vault KV secrets engine (v2)
+  ansible.builtin.uri:
+    url: "{{ vault_addr }}/v1/{{ secret_path }}"
+    method: POST
+    headers:
+      "X-Vault-Token": "{{ vault_token }}"
+    body_format: json
+    body:
+      data:
+        cert: "{{ cert_escaped }}"
+        key: "{{ key_escaped }}"
+  register: vault_write_response
+
+- name: Show Vault write response (for debugging)
+  debug:
+    var: vault_write_response

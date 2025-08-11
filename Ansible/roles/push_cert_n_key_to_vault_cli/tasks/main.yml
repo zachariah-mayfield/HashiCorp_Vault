@@ -1,0 +1,22 @@
+- name: Upload cert and key to Vault using CLI
+  block:
+    - name: Read certificate file
+      slurp:
+        src: "{{ cert_file | expanduser }}"
+      register: cert_raw
+
+    - name: Read key file
+      slurp:
+        src: "{{ key_file | expanduser }}"
+      register: key_raw
+
+    - name: Decode cert and key
+      set_fact:
+        cert: "{{ cert_raw.content | b64decode }}"
+        key: "{{ key_raw.content | b64decode }}"
+
+    - name: Upload to Vault using CLI
+      shell: |
+        export VAULT_ADDR={{ vault_addr }}
+        export VAULT_TOKEN={{ vault_token }}
+        vault kv put {{ vault_path }} cert="{{ cert }}" key="{{ key }}"

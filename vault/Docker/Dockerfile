@@ -15,6 +15,7 @@ RUN apk update && \
 COPY Scripts /vault/Scripts
 COPY Templates /vault/Templates
 COPY config /vault/config
+COPY Certs /vault/certs
 
 # Make sure scripts are executable
 RUN chmod +x /vault/Scripts/*.sh

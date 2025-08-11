@@ -1,0 +1,5 @@
+vault_version: "1.13.3"
+vault_install_dir_unix: "{{ ansible_env.HOME }}/.local/bin"
+vault_install_dir_windows: "C:\\HashiCorp\\Vault"
+vault_binary_name: "vault"
+vault_cli_url_base: "https://releases.hashicorp.com/vault"

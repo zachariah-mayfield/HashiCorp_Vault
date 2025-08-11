@@ -1,0 +1,6 @@
+# These were generated from the script ~/GitHub/Main/Lenovo-T480/Scripts/generate_certificate.sh
+ansible_winrm_cert_pem_path: "{{ lookup('env', 'HOME') }}/GitHub/Main/Lenovo-T480/X_Secret/zachariah.mayfield_Certificate.pem"
+ansible_winrm_cert_key_pem_path: "{{ lookup('env', 'HOME') }}/GitHub/Main/Lenovo-T480/X_Secret/zachariah.mayfield_Certificate.key"
+
+vault_addr: "http://127.0.0.1:8200"
+vault_cert_path: "secret/data/certificates/Lenovo-T480/SSH_user_login"

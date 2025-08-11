@@ -1,0 +1,4 @@
+vault_addr: "http://127.0.0.1:8200"
+secret_path: "secret/data/certificates/Lenovo-T480/SSH_user_login"   # Vault KV v2 API path, note `data/` prefix!
+cert_file: "{{ lookup('env', 'HOME') }}/GitHub/Main/Lenovo-T480/X_Secret/zachariah.mayfield_Certificate.pem"
+key_file: "{{ lookup('env', 'HOME') }}/GitHub/Main/Lenovo-T480/X_Secret/zachariah.mayfield_Certificate.key"
