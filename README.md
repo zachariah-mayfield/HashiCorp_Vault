@@ -52,8 +52,8 @@ PGADMIN_DEFAULT_PASSWORD=<>
 3. Run the launcher script: 
 ```bash
 # bash
-chmod +x Scripts/Run_HashiCorp_Vault_Application.sh
-./Scripts/Run_HashiCorp_Vault_Application.sh
+chmod +x ~"/GitHub/Main/HashiCorp_Vault/Scripts/Build_Scripts/Start_HashiCorp_Vault_From_Scratch.sh"
+sh ~/"GitHub/Main/HashiCorp_Vault/Scripts/Build_Scripts/Start_HashiCorp_Vault_From_Scratch.sh"
 ```
 
 4. Docker Compose will build and launch containers in detached (-d) mode:
@@ -75,7 +75,8 @@ docker-compose down --volumes --remove-orphans
 # Remove containers, volumes, networks, images
 docker-compose down --volumes --remove-orphans
 docker system prune --all --volumes --force
-# Delete generated Vault init files and PostgreSQL config:
+# Delete generated Vault certs init files and PostgreSQL config:
+rm vault/Certs/*
 rm vault/data/vault-init.json
 rm vault/config/vault-config.hcl
 rm postgres/Config/init.sql

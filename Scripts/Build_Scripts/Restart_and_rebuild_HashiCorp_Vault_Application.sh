@@ -1,5 +1,5 @@
 #!/bin/bash
-# ~/GitHub/Main/HashiCorp_Vault/Scripts/Build_Scripts/Run_HashiCorp_Vault_Application.sh
+# ~/GitHub/Main/HashiCorp_Vault/Scripts/Build_Scripts/Restart_and_rebuild_HashiCorp_Vault_Application.sh
 
 # Check if the VIRTUAL_ENV environment variable is not empty.
 if [[ -n "$VIRTUAL_ENV" ]]; then
